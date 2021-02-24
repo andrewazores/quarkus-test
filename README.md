@@ -1,3 +1,5 @@
+[![Docker Repository on Quay](https://quay.io/repository/andrewazores/quarkus-test/status "Docker Repository on Quay")](https://quay.io/repository/andrewazores/quarkus-test)
+
 # code-with-quarkus project
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
