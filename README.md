@@ -29,6 +29,12 @@ If you want to build an _über-jar_, execute the following command:
 
 The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
 
+Build a JVM mode OCI image:
+
+`$BUILDER build -t quay.io/andrewazores/quarkus-test:$VERSION -f src/main/docker/Dockerfile.jvm .`
+
+where `BUILDER` is ex. `podman`, `docker`.
+
 ## Creating a native executable
 
 You can create a native executable using: 
