@@ -2,7 +2,6 @@ package org.acme;
 
 import java.net.URI;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -12,6 +11,7 @@ import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.logging.Logger;
 
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
@@ -22,6 +22,7 @@ public class AppLifecycle {
 
     volatile PluginInfo plugin;
     @Inject @RestClient CryostatService cryostat;
+    @Inject Logger log;
     Future<?> submission;
 
     @ConfigProperty(name = "quarkus.application.name") String appName;
@@ -46,7 +47,7 @@ public class AppLifecycle {
                     int jmxport = Integer.valueOf(System.getProperty("com.sun.management.jmxremote.port", "9097"));
 
                     selfNode.target.connectUrl = URI.create(String.format("service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi", hostname, jmxport));
-                    System.out.println("registering self as " + selfNode.target.connectUrl);
+                    log.info("registering self as " + selfNode.target.connectUrl);
                     cryostat.update(this.plugin.id, this.plugin.token, Set.of(selfNode));
                 } catch (Exception e) {
                     e.printStackTrace();
