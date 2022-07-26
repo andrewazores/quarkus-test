@@ -38,6 +38,9 @@ public class AppLifecycle {
     @ConfigProperty(name = "org.acme.jmxport") int jmxport;
 
     void onStart(@Observes StartupEvent ev) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            onStop(null);
+        }));
         tryRegister();
         if (this.plugin != null) {
             return;
@@ -125,7 +128,11 @@ public class AppLifecycle {
                 if (result.failed()) {
                     log.warn(result.cause());
                     result.cause().printStackTrace();
+                    log.warn("Failed to deregister as Cryostat discovery plugin");
+                    return;
                 }
+                log.infof("Deregistered from Cryostat discovery plugin [%s]", this.plugin.id);
+                this.plugin = null;
             });
         }
         if (this.jmxServer != null) {
