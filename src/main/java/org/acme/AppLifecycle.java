@@ -27,7 +27,7 @@ public class AppLifecycle {
 
     @ConfigProperty(name = "quarkus.application.name") String appName;
     @ConfigProperty(name = "org.acme.jmxport") int jmxport;
-    @ConfigProperty(name = "org.acme.Cryostat.Authorization") String authorization;
+    @ConfigProperty(name = "org.acme.CryostatService.Authorization") String authorization;
 
     void onStart(@Observes StartupEvent ev) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
