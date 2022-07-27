@@ -22,17 +22,17 @@ public interface CryostatService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    JsonObject register(RegistrationInfo registrationInfo);
+    JsonObject register(RegistrationInfo registrationInfo, @HeaderParam("Authorization") String auth);
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
-    void deregister(@PathParam String id, @HeaderParam("Authorization") String token);
+    void deregister(@PathParam String id, @HeaderParam("Authorization") String auth);
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
-    void update(@PathParam String id, @HeaderParam("Authorization") String token, Set<Node> subtree);
+    void update(@PathParam String id, @HeaderParam("Authorization") String auth, Set<Node> subtree);
 
 }

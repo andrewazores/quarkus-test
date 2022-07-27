@@ -36,6 +36,7 @@ public class AppLifecycle {
 
     @ConfigProperty(name = "quarkus.application.name") String appName;
     @ConfigProperty(name = "org.acme.jmxport") int jmxport;
+    @ConfigProperty(name = "org.acme.Cryostat.Authorization") String authorization;
 
     void onStart(@Observes StartupEvent ev) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -70,7 +71,7 @@ public class AppLifecycle {
                 RegistrationInfo registration = new RegistrationInfo();
                 registration.realm = "quarkus-test";
                 registration.callback = "http://localhost/unimplemented-callback";
-                JsonObject response = cryostat.register(registration);
+                JsonObject response = cryostat.register(registration, authorization);
                 PluginInfo plugin = response.getJsonObject("data").getJsonObject("result").mapTo(PluginInfo.class);
 
                 Node selfNode = new Node();
@@ -81,7 +82,7 @@ public class AppLifecycle {
 
                 selfNode.target.connectUrl = URI.create(getSelfJmxUrl().toString());
                 log.info("registering self as " + selfNode.target.connectUrl);
-                cryostat.update(plugin.id, plugin.token, Set.of(selfNode));
+                cryostat.update(plugin.id, authorization, Set.of(selfNode));
 
                 promise.complete(plugin);
             } catch (Exception e) {
@@ -119,7 +120,7 @@ public class AppLifecycle {
         if (this.plugin != null) {
             vertx.executeBlocking(promise -> {
                 try {
-                    cryostat.deregister(this.plugin.id, this.plugin.token);
+                    cryostat.deregister(this.plugin.id, authorization);
                     promise.complete();
                 } catch (Exception e) {
                     promise.fail(e);
