@@ -1,19 +1,11 @@
 package org.acme;
 
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.rmi.registry.LocateRegistry;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.management.MBeanServer;
-import javax.management.remote.JMXConnectorServer;
-import javax.management.remote.JMXConnectorServerFactory;
-import javax.management.remote.JMXServiceURL;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -31,7 +23,6 @@ public class AppLifecycle {
     @Inject @RestClient CryostatService cryostat;
     volatile PluginInfo plugin;
     long submission = Long.MIN_VALUE;
-    JMXConnectorServer jmxServer;
     @Inject Logger log;
 
     @ConfigProperty(name = "quarkus.application.name") String appName;
@@ -43,9 +34,6 @@ public class AppLifecycle {
             onStop(null);
         }));
         tryRegister();
-        if (this.plugin != null) {
-            return;
-        }
         this.submission = vertx.setPeriodic(5_000, id -> {
             tryRegister();
             if (this.plugin != null) {
@@ -54,20 +42,12 @@ public class AppLifecycle {
         });
     }
 
-    void onStop(@Observes ShutdownEvent ev) {
-        if (this.submission != Long.MIN_VALUE) {
-            this.vertx.cancelTimer(this.submission);
-        }
-        deregister();
-    }
-
     private void tryRegister() {
         if (this.plugin != null) {
             return;
         }
         vertx.<PluginInfo>executeBlocking(promise -> {
             try {
-                enableJmx();
                 RegistrationInfo registration = new RegistrationInfo();
                 registration.realm = "quarkus-test";
                 registration.callback = "http://localhost/unimplemented-callback";
@@ -80,7 +60,10 @@ public class AppLifecycle {
                 selfNode.target = new Node.Target();
                 selfNode.target.alias = appName;
 
-                selfNode.target.connectUrl = URI.create(getSelfJmxUrl().toString());
+                String hostname = System.getProperty("java.rmi.server.hostname", "localhost");
+                int jmxport = Integer.valueOf(System.getProperty("com.sun.management.jmxremote.port", "9097"));
+
+                selfNode.target.connectUrl = URI.create(String.format("service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi", hostname, jmxport));
                 log.info("registering self as " + selfNode.target.connectUrl);
                 cryostat.update(plugin.id, authorization, Set.of(selfNode));
 
@@ -99,21 +82,11 @@ public class AppLifecycle {
         });
     }
 
-    private void enableJmx() throws IOException {
-        if (this.jmxServer != null) {
-            return;
+    void onStop(@Observes ShutdownEvent ev) {
+        if (this.submission != Long.MIN_VALUE) {
+            this.vertx.cancelTimer(this.submission);
         }
-        try {
-            LocateRegistry.createRegistry(jmxport);
-            MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-            JMXServiceURL jmxUrl = getSelfJmxUrl();
-            this.jmxServer = JMXConnectorServerFactory.newJMXConnectorServer(jmxUrl, null, mBeanServer);
-            this.jmxServer.start();
-            log.infof("Started JMX on %d", jmxport);
-        } catch (IOException e) {
-            this.jmxServer = null;
-            throw e;
-        }
+        deregister();
     }
 
     private void deregister() {
@@ -136,19 +109,6 @@ public class AppLifecycle {
                 this.plugin = null;
             });
         }
-        if (this.jmxServer != null) {
-            try {
-                this.jmxServer.stop();
-            } catch (IOException e) {
-                log.warn(e);
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private JMXServiceURL getSelfJmxUrl() throws MalformedURLException {
-        String hostname = System.getProperty("java.rmi.server.hostname", "localhost");
-        return new JMXServiceURL(String.format("service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi", hostname, jmxport));
     }
 
 }
