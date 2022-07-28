@@ -26,7 +26,9 @@ public class AppLifecycle {
     @Inject Logger log;
 
     @ConfigProperty(name = "quarkus.application.name") String appName;
+    @ConfigProperty(name = "quarkus.http.port") int httpPort;
     @ConfigProperty(name = "org.acme.jmxport") int jmxport;
+    @ConfigProperty(name = "org.acme.CryostatService.callback-host") String callbackHost;
     @ConfigProperty(name = "org.acme.CryostatService.Authorization") String authorization;
 
     void onStart(@Observes StartupEvent ev) {
@@ -50,7 +52,7 @@ public class AppLifecycle {
             try {
                 RegistrationInfo registration = new RegistrationInfo();
                 registration.realm = "quarkus-test";
-                registration.callback = "http://localhost/unimplemented-callback";
+                registration.callback = String.format("http://%s:%d/cryostat-discovery", callbackHost, httpPort);
                 JsonObject response = cryostat.register(registration, authorization);
                 PluginInfo plugin = response.getJsonObject("data").getJsonObject("result").mapTo(PluginInfo.class);
 
