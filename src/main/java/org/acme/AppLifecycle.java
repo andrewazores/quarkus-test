@@ -11,6 +11,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
+import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import io.vertx.core.Vertx;
@@ -78,6 +79,7 @@ public class AppLifecycle {
                 log.warn(result.cause());
                 result.cause().printStackTrace();
                 deregister();
+                Quarkus.asyncExit(1);
                 return;
             }
             this.plugin = result.result();
