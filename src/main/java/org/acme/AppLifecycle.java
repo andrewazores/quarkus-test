@@ -1,6 +1,7 @@
 package org.acme;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
@@ -12,6 +13,10 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
+import io.cryostat.core.discovery.BaseNodeType;
+import io.cryostat.core.discovery.EnvironmentNode;
+import io.cryostat.core.discovery.ServiceRef;
+import io.cryostat.core.discovery.TargetNode;
 import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
@@ -48,17 +53,13 @@ public class AppLifecycle {
             JsonObject response = cryostat.register(registration, authorization);
             PluginInfo plugin = response.getJsonObject("data").getJsonObject("result").mapTo(PluginInfo.class);
 
-            Node selfNode = new Node();
-            selfNode.nodeType = "JVM";
-            selfNode.name = "quarkus-test-" + plugin.id;
-            selfNode.target = new Node.Target();
-            selfNode.target.alias = appName;
-
             String hostname = System.getProperty("java.rmi.server.hostname", "localhost");
             int jmxport = Integer.valueOf(System.getProperty("com.sun.management.jmxremote.port", "9097"));
+            ServiceRef selfReference = new ServiceRef(URI.create(String.format("service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi", hostname, jmxport)), appName);
+            TargetNode selfReferenceTarget = new TargetNode(BaseNodeType.JVM.getKind(), selfReference);
+            EnvironmentNode selfNode = new EnvironmentNode("quarkus-test-" + plugin.id, "quarkus-test", Collections.emptyMap(), Set.of(selfReferenceTarget));
 
-            selfNode.target.connectUrl = URI.create(String.format("service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi", hostname, jmxport));
-            log.infof("publishing self as %s", selfNode.target.connectUrl);
+            log.infof("publishing self as %s", selfReference.getServiceUri().toString());
             cryostat.update(plugin.id, authorization, Set.of(selfNode));
 
             this.plugin = plugin;

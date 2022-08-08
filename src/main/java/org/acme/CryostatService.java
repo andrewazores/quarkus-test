@@ -13,6 +13,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.annotations.jaxrs.HeaderParam;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
+import io.cryostat.core.discovery.AbstractNode;
 import io.vertx.core.json.JsonObject;
 
 @Path("/api/v2.2/discovery")
@@ -33,6 +34,6 @@ public interface CryostatService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
-    void update(@PathParam String id, @HeaderParam("Authorization") String auth, Set<Node> subtree);
+    void update(@PathParam String id, @HeaderParam("Authorization") String auth, Set<? extends AbstractNode> subtree);
 
 }
