@@ -28,6 +28,7 @@ public class AppLifecycle {
     @ConfigProperty(name = "quarkus.application.name") String appName;
     @ConfigProperty(name = "quarkus.http.port") int httpPort;
     @ConfigProperty(name = "org.acme.jmxport") int jmxport;
+    @ConfigProperty(name = "org.acme.jmxhost") String jmxhost;
     @ConfigProperty(name = "org.acme.CryostatService.callback-host") String callbackHost;
     @ConfigProperty(name = "org.acme.CryostatService.Authorization") String authorization;
 
@@ -54,10 +55,9 @@ public class AppLifecycle {
             selfNode.target = new Node.Target();
             selfNode.target.alias = appName;
 
-            String hostname = System.getProperty("java.rmi.server.hostname", "localhost");
-            int jmxport = Integer.valueOf(System.getProperty("com.sun.management.jmxremote.port", "9097"));
+            int port = Integer.valueOf(System.getProperty("com.sun.management.jmxremote.port", String.valueOf(jmxport)));
 
-            selfNode.target.connectUrl = URI.create(String.format("service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi", hostname, jmxport));
+            selfNode.target.connectUrl = URI.create(String.format("service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi", jmxhost, port));
             log.infof("publishing self as %s", selfNode.target.connectUrl);
             cryostat.update(plugin.id, authorization, Set.of(selfNode));
 
