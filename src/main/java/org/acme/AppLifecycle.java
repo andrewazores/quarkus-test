@@ -34,14 +34,6 @@ public class AppLifecycle {
     @ConfigProperty(name = "org.acme.CryostatService.Authorization") String authorization;
 
     void onStart(@Observes StartupEvent ev) {
-        tryRegister();
-    }
-
-    private void tryRegister() {
-        if (this.plugin != null) {
-            return;
-        }
-
         try {
             RegistrationInfo registration = new RegistrationInfo();
             registration.realm = "quarkus-test-" + UUID.randomUUID();
@@ -68,7 +60,6 @@ public class AppLifecycle {
             e.printStackTrace();
             deregister();
             Quarkus.asyncExit(1);
-            return;
         }
     }
 
