@@ -25,6 +25,7 @@ public class AppLifecycle {
     long submission = Long.MIN_VALUE;
     @Inject Logger log;
 
+    @ConfigProperty(name = "org.acme.CryostatService/mp-rest/url") String cryostatApiUrl;
     @ConfigProperty(name = "quarkus.application.name") String appName;
     @ConfigProperty(name = "quarkus.http.port") int httpPort;
     @ConfigProperty(name = "org.acme.jmxport") int jmxport;
@@ -45,7 +46,7 @@ public class AppLifecycle {
             RegistrationInfo registration = new RegistrationInfo();
             registration.realm = "quarkus-test-" + UUID.randomUUID();
             registration.callback = String.format("http://%s:%d/cryostat-discovery", callbackHost, httpPort);
-            log.infof("registering self as %s", registration.realm);
+            log.infof("registering self as %s at %s", registration.realm, cryostatApiUrl);
             JsonObject response = cryostat.register(registration, authorization);
             PluginInfo plugin = response.getJsonObject("data").getJsonObject("result").mapTo(PluginInfo.class);
 
