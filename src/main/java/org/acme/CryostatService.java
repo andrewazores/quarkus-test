@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.annotations.jaxrs.HeaderParam;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
+import org.jboss.resteasy.annotations.jaxrs.QueryParam;
 
 import io.vertx.core.json.JsonObject;
 
@@ -27,12 +28,12 @@ public interface CryostatService {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
-    void deregister(@PathParam String id, @HeaderParam("Authorization") String auth);
+    void deregister(@PathParam String id, @QueryParam String token);
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
-    void update(@PathParam String id, @HeaderParam("Authorization") String auth, Set<Node> subtree);
+    void update(@PathParam String id, @QueryParam String token, Set<Node> subtree);
 
 }
