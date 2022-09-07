@@ -20,6 +20,8 @@ import io.vertx.core.json.JsonObject;
 @ApplicationScoped
 public class AppLifecycle {
 
+    static final String EVENT_BUS_ADDRESS = AppLifecycle.class.getName();
+
     @Inject @RestClient CryostatService cryostat;
     volatile RegistrationInfo registration;
     volatile PluginInfo plugin;
@@ -49,6 +51,10 @@ public class AppLifecycle {
                 log.error("Registration failure", e);
             }
         });
+
+        vertx.eventBus()
+            .consumer(EVENT_BUS_ADDRESS)
+            .handler(m -> reregister());
     }
 
     void onStop(@Observes ShutdownEvent ev) {
@@ -56,7 +62,7 @@ public class AppLifecycle {
         deregister();
     }
 
-    void register() {
+    private void register() {
         deregister();
 
         log.infof("registering self as %s at %s with %s", registration.realm, registration.callback, cryostatApiUrl);
@@ -79,7 +85,7 @@ public class AppLifecycle {
         this.plugin = plugin;
     }
 
-    void reregister() {
+    private void reregister() {
         if (this.plugin == null) {
             register();
             return;

@@ -7,16 +7,20 @@ import javax.ws.rs.Path;
 
 import org.jboss.logging.Logger;
 
+import io.vertx.core.Vertx;
+
 @Path("/cryostat-discovery")
 public class CryostatResource {
 
     @Inject AppLifecycle lifecycle;
     @Inject Logger log;
+    @Inject Vertx vertx;
 
     @POST
     public Void postPing() {
         log.info("received Cryostat registration ping, attempting re-registration...");
-        lifecycle.reregister();
+        vertx.eventBus()
+            .publish(AppLifecycle.EVENT_BUS_ADDRESS, null);
         return null;
     }
 
