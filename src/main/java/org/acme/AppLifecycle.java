@@ -68,6 +68,7 @@ public class AppLifecycle {
         log.infof("registering self as %s at %s with %s", registration.realm, registration.callback, cryostatApiUrl);
         JsonObject response = cryostat.register(registration, authorization);
         PluginInfo plugin = response.getJsonObject("data").getJsonObject("result").mapTo(PluginInfo.class);
+        this.registration.id = plugin.id;
         this.registration.token = plugin.token;
 
         Node selfNode = new Node();
