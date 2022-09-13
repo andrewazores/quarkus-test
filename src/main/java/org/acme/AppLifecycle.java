@@ -62,6 +62,10 @@ public class AppLifecycle {
         deregister();
     }
 
+    public boolean isRegistered() {
+        return this.registration.id != null && !this.registration.id.isBlank();
+    }
+
     private void register() {
         deregister();
 

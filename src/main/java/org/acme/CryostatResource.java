@@ -4,6 +4,7 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 
 import org.jboss.logging.Logger;
 
@@ -17,15 +18,21 @@ public class CryostatResource {
     @Inject Vertx vertx;
 
     @POST
-    public Void postPing() {
+    public Response postPing() {
+        if (!lifecycle.isRegistered()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         log.info("received Cryostat registration ping, attempting re-registration...");
         vertx.eventBus()
             .publish(AppLifecycle.EVENT_BUS_ADDRESS, null);
-        return null;
+        return Response.noContent().build();
     }
 
     @GET
-    public Void getPing() {
-        return null;
+    public Response getPing() {
+        if (!lifecycle.isRegistered()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.noContent().build();
     }
 }
