@@ -39,7 +39,7 @@ public class AppLifecycle {
 
     void onStart(@Observes StartupEvent ev) {
         this.registration = new RegistrationInfo();
-        this.registration.realm = "quarkus-test-" + UUID.randomUUID();
+        this.registration.realm = appName;
         this.registration.callback = String.format("http://%s:%d/cryostat-discovery", callbackHost, httpPort);
 
         vertx.setPeriodic(10_000L, timerId -> {
