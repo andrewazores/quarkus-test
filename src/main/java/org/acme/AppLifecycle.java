@@ -2,7 +2,6 @@ package org.acme;
 
 import java.net.URI;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
