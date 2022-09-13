@@ -20,19 +20,19 @@ public class CryostatResource {
     @POST
     public Response postPing() {
         if (!lifecycle.isRegistered()) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.noContent().header("Content-Length", 0).build();
         }
         log.info("received Cryostat registration ping, attempting re-registration...");
         vertx.eventBus()
             .publish(AppLifecycle.EVENT_BUS_ADDRESS, null);
-        return Response.noContent().build();
+        return Response.ok().header("Content-Length", 0).build();
     }
 
     @GET
     public Response getPing() {
         if (!lifecycle.isRegistered()) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.noContent().header("Content-Length", 0).build();
         }
-        return Response.noContent().build();
+        return Response.ok().header("Content-Length", 0).build();
     }
 }
