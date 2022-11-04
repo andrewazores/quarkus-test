@@ -35,8 +35,12 @@ public class AppLifecycle {
     @ConfigProperty(name = "org.acme.jmxhost") String jmxhost;
     @ConfigProperty(name = "org.acme.CryostatService.callback-host") String callbackHost;
     @ConfigProperty(name = "org.acme.CryostatService.Authorization") String authorization;
+    @ConfigProperty(name = "org.acme.CryostatService.enabled") boolean enabled;
 
     void onStart(@Observes StartupEvent ev) {
+        if (!enabled) {
+            return;
+        }
         this.registration = new RegistrationInfo();
         this.registration.realm = appName;
         this.registration.callback = String.format("http://%s:%d/cryostat-discovery", callbackHost, httpPort);
@@ -57,6 +61,9 @@ public class AppLifecycle {
     }
 
     void onStop(@Observes ShutdownEvent ev) {
+        if (!enabled) {
+            return;
+        }
         vertx.cancelTimer(timerId);
         deregister();
     }
