@@ -26,7 +26,7 @@ creating the file if it does not exist:
   xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
   <servers>
     <server>
-      <id>github</id>
+      <id>github-cryostat-agent</id>
       <username>$MY_GITHUB_USERNAME</username>
       <password>$MY_GITHUB_ACCESSTOKEN</password>
     </server>
