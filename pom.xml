@@ -24,6 +24,7 @@
     <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
     <dependency-plugin.version>3.3.0</dependency-plugin.version>
     <io.cryostat.agent.version>0.4.0-SNAPSHOT</io.cryostat.agent.version>
+    <org.slf4j.version>2.0.7</org.slf4j.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -57,6 +58,12 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-rest-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <version>${org.slf4j.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>io.rest-assured</groupId>
