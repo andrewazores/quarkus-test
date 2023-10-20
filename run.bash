@@ -7,7 +7,8 @@ trap cleanup EXIT
 
 function loadAgent() {
   sleep 3
-  podman exec quarkus-test java -jar /deployments/app/cryostat-agent-shaded.jar
+  podman exec quarkus-test java -jar /deployments/app/cryostat-agent-shaded.jar -Dcryostat.agent.baseuri=http://localhost:9876 @/deployments/app/agentargs
+  echo "Agent launcher command exited: $?"
 }
 
 podman run --name quarkus-test --rm -d quay.io/andrewazores/quarkus-test:latest

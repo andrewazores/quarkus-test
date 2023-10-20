@@ -92,4 +92,5 @@ COPY --chown=185 target/quarkus-app/app/ /deployments/app/
 COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
 
 COPY --chown=185 target/dependency/$CRYOSTAT_AGENT /deployments/app/$CRYOSTAT_AGENT
+COPY --chown=185 ./agentargs /deployments/app/
 # COPY --chown=185 target/quarkus-app/lib/main/io.cryostat.cryostat-agent-*.jar /deployments/app/$CRYOSTAT_AGENT

@@ -1,0 +1,1 @@
+--smartTrigger=[ProcessCpuLoad>0.2]~profile
