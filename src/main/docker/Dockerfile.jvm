@@ -83,7 +83,7 @@ ENV CRYOSTAT_AGENT=cryostat-agent-shaded.jar
 EXPOSE 10010 9097
 USER 185
 ENV AB_JOLOKIA_OFF=""
-ENV JAVA_OPTS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Dcom.sun.management.jmxremote.port=9097 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -javaagent:/deployments/app/cryostat-agent.jar"
+ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Dcom.sun.management.jmxremote.port=9097 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -javaagent:/deployments/app/cryostat-agent.jar"
 ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
 
 # We make four distinct layers so if there are application changes the library layers can be re-used
